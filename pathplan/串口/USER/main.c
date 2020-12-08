@@ -58,7 +58,7 @@ void My_USART2_Init(void)
 }
 
 
-	u8 res;
+	u16 res;
 void USART2_IRQHandler(void)
 {
 

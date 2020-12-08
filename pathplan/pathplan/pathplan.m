@@ -1,13 +1,13 @@
 clear;clc
-for robot_y=1000:50:9950
-    destination=[11000 5000]; 
+for robot_y=1000:50:5950
+    destination=[1000 1000]; 
     obstacle_outside_x=[2000 1700 3800 6000 8200 10300 10000];%从左到右排序列出
     obstacle_outside_y=[6000 4200 2000 2000 2000 3800 6000];%
     obstacle_point=[obstacle_outside_x;obstacle_outside_y];
     size_obstacle_point=size(obstacle_outside_x);        %障碍物个数
     num_obstacle_point=size_obstacle_point(1,2);
     num_obstacle_point=int8(num_obstacle_point);
-    current_position_x=5700;
+    current_position_x=2000;
     current_position_y=robot_y;
     current_position=[current_position_x current_position_y];
     vertices=[current_position]';

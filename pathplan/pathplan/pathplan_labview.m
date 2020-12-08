@@ -1,5 +1,5 @@
 % destination=[5000 1800]; 
-destination=[12000 5000]; 
+destination=[1000 1000]; 
 obstacle_outside_x=[2000 1700 3800 6000 8200 10300 10000];%从左到右排序列出
 obstacle_outside_y=[6000 4200 2000 2000 2000 3800 6000];%
 obstacle_point=[obstacle_outside_x;obstacle_outside_y];
@@ -7,7 +7,7 @@ size_obstacle_point=size(obstacle_outside_x);        %障碍物个数
 num_obstacle_point=size_obstacle_point(1,2);
 num_obstacle_point=int8(num_obstacle_point);
 % current_position=[11900 5000];
-current_position=[5000 1800];
+current_position=[2000 1200];
 vertices=[current_position]';
 k=(current_position(2)-destination(2))/(current_position(1)-destination(1));
 b=k*(-current_position(1))+current_position(2);
@@ -272,46 +272,50 @@ if((current_position(2)>=-current_position(1)+6000) && (current_position(2)<=cur
 else %在外部运行的情况
     flag_change1=0;
     flag_change2=0;
-    for i=1:num_obstacle_point-1
-        A=current_position;B=destination;C=obstacle_point(:,i)';D=obstacle_point(:,i+1)';
+    destination1=destination;
+    for i=1:num_obstacle_point-1        
+        A=current_position;B=destination1;C=obstacle_point(:,i)';D=obstacle_point(:,i+1)';
         flag_intersect=0;
-        AB=B-A;
-        AC=C-A;
-        AD=D-A;
-        AB_cross_AC=AB(1)*AC(2)-AC(1)*AB(2);
-        AB_cross_AC=AB_cross_AC/abs(AB_cross_AC);
-        AB_cross_AD=AB(1)*AD(2)-AD(1)*AB(2);
-        AB_cross_AD=AB_cross_AD/abs(AB_cross_AD);
-        if (AB_cross_AC*AB_cross_AD<=0)
+        AB=B-A;CD=D-C;
+        k1=AB(2)/AB(1);
+        k2=CD(2)/CD(1);
+        b1=A(2)-k1*A(1);
+        b2=C(2)-k2*C(1);
+        x_intersect=(b2-b1)/(k1-k2);
+        y_intersect=k1*x_intersect+b1;
+        if((min(A(1),B(1))<x_intersect) && (x_intersect<max(A(1),B(1))) && (min(C(1),D(1))<x_intersect) && (x_intersect<max(C(1),D(1))) && (min(A(2),B(2))<y_intersect) && (y_intersect<max(A(2),B(2))) && (min(C(2),D(2))<y_intersect) && (y_intersect<max(C(2),D(2))))
             flag_intersect=1;
-        end         
+        end      
         if flag_intersect==1
-            if(current_position(1)<destination(1))
+            if(current_position(1)<destination1(1))
                 current_position=obstacle_point(:,i+1)'-[0,500];
                 vertices=[vertices,current_position'];
                 flag_change1=1;
             else
-                destination=obstacle_point(:,i+1)'-[0,500];
-                vertices=[vertices,destination'];
+                destination1=obstacle_point(:,i+1)'-[0,500];
+                vertices=[vertices,destination1'];
                 flag_change2=1;
                 if(i==num_obstacle_point-2)
                     vertices(:,1)=[];
                     vertices=[vertices,current_position'];         
                 end
             end
+        else
+            %vertices=[vertices,destination'];
         end
     end
     if(flag_change1==1)
         vertices=[vertices,destination'];
-    end
-    if(flag_change2==1)
+    elseif (flag_change2==1)
         vertices(:,1)=[];
         vertices=[vertices,current_position'];
+    else 
+        vertices=[vertices,destination'];
     end
 end
-% map_cspace();
-% hold on;
-% pause(0.05);
-% plot(vertices(1,:),vertices(2,:),'r');
-% hold off;
+map_cspace();
+hold on;
+pause(0.05);
+plot(vertices(1,:),vertices(2,:),'r');
+hold off;
 % (k2+1).*(k2<0)+(-k2+1).*(k2>=0)
